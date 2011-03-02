@@ -126,6 +126,17 @@ In the example above, you will search by _name_, but the autocomplete list will 
 
 This wouldn't really make much sense unless you use it with the :id_element HTML tag. (See below)
 
+#### :scope
+
+If you want the autocomplete results to be found based on a model scope instead of on a model attibute you can set the :scope option to true:
+
+    class ProductsController < Admin::BaseController
+      autocomplete :brand, :my_scope, :scope => true, :display_value => :name
+    end
+
+The second attribute is the scope name (and not an attribute)
+Also note that you have to specify the :display_value attribute. Otherwize the code will ask the brand object for his 'my_scope' value and that will fail.
+
 ### View
 
 On your view, all you have to do is include the attribute autocomplete on the text field

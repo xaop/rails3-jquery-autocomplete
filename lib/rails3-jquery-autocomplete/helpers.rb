@@ -90,15 +90,30 @@ module Rails3JQueryAutocomplete
 
       limit = get_autocomplete_limit(options)
       implementation = get_implementation(model)
-      order = get_autocomplete_order(implementation, method, options)
 
       case implementation
         when :mongoid
+          order_method = "order_by"
           search = (is_full_search ? '.*' : '^') + term + '.*'
-          items = model.where(method.to_sym => /#{search}/i).limit(limit).order_by(order)
+          if options[:scope]
+            items = model.send(method.to_sym, term).limit(limit)
+          else
+            items = model.where(method.to_sym => /#{search}/i).limit(limit)
+          end
         when :activerecord
-          items = model.where(["LOWER(#{method}) LIKE ?", "#{(is_full_search ? '%' : '')}#{term.downcase}%"]) \
-            .limit(limit).order(order)
+          order_method = "order"
+          if options[:scope]
+            items = model.send(method.to_sym, term).limit(limit)
+          else
+            items = model.where(["LOWER(#{method}) LIKE ?", "#{(is_full_search ? '%' : '')}#{term.downcase}%"]).limit(limit)
+          end
+      end
+
+      if options[:scope] 
+        items
+      else # If we use a scope the order should be done in this scope.
+        order = get_autocomplete_order(implementation, method, options)
+        items.send(order_method, order)
       end
     end
 
