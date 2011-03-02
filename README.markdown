@@ -83,6 +83,39 @@ This will create an action _autocomplete_brand_name_ on your controller, don't f
       get :autocomplete_brand_name, :on => :collection
     end
 
+This example will display all the brands that have a name matching the pattern you specify in your autocomplete text-field
+
+### Limit the results based on the model relations:
+
+Imagine we have a Product and a Brand model linked by a 'has_many' relation:
+
+    class Brand < ActiveRecord::Base
+      has_many :products
+    end
+    
+    class Product < ActiveRecord::Base
+      belongs_to :brand
+    end
+
+In the show view of the BrandsController you have a search_field used to find a product of the current brand object.
+You want this field to do autocompletion on the name attribute of the product model. 
+You don't want to querry on all the products existing in the database but only to the products that belongs to the current brand object.
+
+To do that you first need to add the autocomplete action to your brand controller:
+
+  class BrandsController < Admin::BaseController
+    autocomplete :product, :name
+  end
+
+In your routes file you'll not add a "collection" but a "member" entry to the brands resources:
+
+  resources :brands do
+    get :autocomplete_product_name, :on => :member
+  end
+
+As this is a member route, the "autocomplete_product_name" method of your BrandController will get a params[:id].
+The search will retreive the brand object thanks to this id and will only search for matching products within: brand.products
+
 ### Options
 
 #### :full => true
@@ -104,6 +137,40 @@ The following terms would match the query 'un':
 Only the following terms mould match the query 'un':
 
 * Unacceptable
+
+#### :parent_class_name
+
+When you limit the results based on the model relations (see example above), the parent model name ('Brand' in the example) is guessed based on the name of the controller where you added the 'autocomplete' statement. (controller name: 'BrandsController' => model name: 'Brand').
+
+If you don't have this naming convention for you model-controllers, you can pass the parent_class_name as a parameter:
+
+  class BrandsController < Admin::BaseController
+    autocomplete :product, :name, :parent_class_name => "MyBrand"
+  end
+
+The autocomplete_product_name method will then retreive the parent object with: MyBrand.find(params[:id])
+
+#### :relation_name
+
+When you limit the results based on the model relations (see example above), we use the name of the model on which you autocomplete to find the relation name:
+  
+  autocomplete :product, :name
+
+Here, the model name is 'product', we assume then that the brand model has_many :products (the results will be filtered within brand.products)
+But in the case you have a relation like: 
+
+  class Brand < ActiveRecord::Base
+    has_many :nice_products, :class_name => "Product"
+  end
+
+Then brand.products will not work.
+You then need to specify the :relation_name parameter:
+
+  class BrandsController < Admin::BaseController
+    autocomplete :product, :name, :relation_name => "nice_products"
+  end
+
+The results will then be filtered within: brand.nice_products
 
 #### :display_value
 
@@ -144,6 +211,12 @@ If you are not using a FormBuilder (form_for) or you just want to include an aut
 
     form_tag 'some/path'
       autocomplete_field_tag 'address', '', address_autocomplete_path, :size => 75
+    end
+
+Or in the case of a "member" route (see: "Limit the results based on the model relations" above):
+
+    form_tag 'some/path'
+      autocomplete_field_tag 'search_product', '', autocomplete_product_name_brand_path(current_brand), :size => 75
     end
 
 Now your autocomplete code is unobtrusive, Rails 3 style.

@@ -20,6 +20,18 @@ module Rails3JQueryAutocomplete
       object = model_sym.to_s.camelize.constantize
     end
 
+    def get_parent(parent_class_name)
+      if parent_id = params[:id]
+        parent_class_name = parent_class_name || params[:controller].singularize
+        begin
+          parent_model = get_object(parent_class_name)
+        rescue
+          raise "Couldn't find any ActiveRecord model with name: #{parent_class_name}. Please indicate a valid model name via the :parent_class_name option."
+        end
+        parent_model.find(parent_id)
+      end
+    end
+
     # Returns a symbol representing what implementation should be used to query
     # the database and raises *NotImplementedError* if ORM implementor can not be found
     def get_implementation(object) 
@@ -86,6 +98,7 @@ module Rails3JQueryAutocomplete
       method = parameters[:method]
       options = parameters[:options]
       term = parameters[:term]
+      parent = parameters[:parent]
       is_full_search = options[:full]
 
       limit = get_autocomplete_limit(options)
@@ -93,12 +106,19 @@ module Rails3JQueryAutocomplete
       order = get_autocomplete_order(implementation, method, options)
 
       case implementation
-        when :mongoid
-          search = (is_full_search ? '.*' : '^') + term + '.*'
-          items = model.where(method.to_sym => /#{search}/i).limit(limit).order_by(order)
-        when :activerecord
-          items = model.where(["LOWER(#{method}) LIKE ?", "#{(is_full_search ? '%' : '')}#{term.downcase}%"]) \
-            .limit(limit).order(order)
+      when :mongoid
+        order_method = "order_by"
+        search = (is_full_search ? '.*' : '^') + term + '.*'
+        where_clause = {method.to_sym => /#{search}/i}
+      when :activerecord
+        order_method = "order"
+        where_clause = ["LOWER(#{method}) LIKE ?", "#{(is_full_search ? '%' : '')}#{term.downcase}%"]
+      end
+      if parent
+        relation_name = options[:relation_name] || model.name.underscore.pluralize
+        items = parent.send(relation_name).where(where_clause).limit(limit).send(order_method, order)
+      else
+        items = model.where(where_clause).limit(limit).send(order_method, order)
       end
     end
 
