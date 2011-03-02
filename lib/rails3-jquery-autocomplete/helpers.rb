@@ -103,22 +103,33 @@ module Rails3JQueryAutocomplete
 
       limit = get_autocomplete_limit(options)
       implementation = get_implementation(model)
-      order = get_autocomplete_order(implementation, method, options)
 
-      case implementation
-      when :mongoid
-        order_method = "order_by"
-        search = (is_full_search ? '.*' : '^') + term + '.*'
-        where_clause = {method.to_sym => /#{search}/i}
-      when :activerecord
-        order_method = "order"
-        where_clause = ["LOWER(#{method}) LIKE ?", "#{(is_full_search ? '%' : '')}#{term.downcase}%"]
-      end
-      if parent
-        relation_name = options[:relation_name] || model.name.underscore.pluralize
-        items = parent.send(relation_name).where(where_clause).limit(limit).send(order_method, order)
+
+      if options[:scope]
+        # If we use a scope the order should be done in this scope.
+        if parent
+          relation_name = options[:relation_name] || model.name.underscore.pluralize
+          items = parent.send(relation_name).send(method.to_sym, term).limit(limit)
+        else
+          items = model.send(method.to_sym, term).limit(limit)
+        end
       else
-        items = model.where(where_clause).limit(limit).send(order_method, order)
+        case implementation
+        when :mongoid
+          order_method = "order_by"
+          search = (is_full_search ? '.*' : '^') + term + '.*'
+          where_clause = {method.to_sym => /#{search}/i}
+        when :activerecord
+          order_method = "order"
+          where_clause = ["LOWER(#{method}) LIKE ?", "#{(is_full_search ? '%' : '')}#{term.downcase}%"]
+        end
+        order = get_autocomplete_order(implementation, method, options)
+        if parent
+          relation_name = options[:relation_name] || model.name.underscore.pluralize
+          items = parent.send(relation_name).where(where_clause).limit(limit).send(order_method, order)
+        else
+          items = model.where(where_clause).limit(limit).send(order_method, order)
+        end
       end
     end
 
