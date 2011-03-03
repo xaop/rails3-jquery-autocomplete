@@ -240,6 +240,7 @@ If you need to use the id of the selected object, you can use the *:id_element* 
 
 This will update the field with id *#some_element with the id of the selected object. The value for this option can be any jQuery selector.
 
+<<<<<<< HEAD
 ### Autocomplete widget options
 
 The Jquery autocomplete widget allow the following options: 'disabled', 'appendTo', 'delay', 'minLength' and 'source' (see: http://docs.jquery.com/UI/Autocomplete#option-disabled)
@@ -292,6 +293,14 @@ Default = 2
 Defines the data to use.
 
 The source options can obviously not be specified here since it is handled by this plugin itself.
+=======
+### Customize the css of the result list
+
+You can add custom css for the result list (ul, li, and/or a):
+
+
+    f.autocomplete_field :brand_name, autocomplete_brand_name_products_path, :result_list_css => {:ul => {:width => "100px"}, :li => {....}, :a => {:color => "red"}}.to_json
+>>>>>>> custom_css_on_results
 
 ## Formtastic
 
