@@ -156,6 +156,59 @@ If you need to use the id of the selected object, you can use the *:id_element* 
 
 This will update the field with id *#some_element with the id of the selected object. The value for this option can be any jQuery selector.
 
+### Autocomplete widget options
+
+The Jquery autocomplete widget allow the following options: 'disabled', 'appendTo', 'delay', 'minLength' and 'source' (see: http://docs.jquery.com/UI/Autocomplete#option-disabled)
+
+You can define values for these options by adding HTML tags to your 'autocomplete_field' field in the view:
+
+#### disabled
+
+Disables (true) or enables (false) the autocomplete. Can be set when initialising (first creating) the autocomplete.
+
+Default = false
+
+    f.autocomplete_field :brand_name, autocomplete_brand_name_products_path, :autocomplete_disabled => true
+    
+If you disable de autocomplete when initialising, you'll probably want to enable it somewhere else in your javascript code:
+
+Get or set the disabled option, after init:
+
+    //getter
+    var disabled = $( ".selector" ).autocomplete( "option", "disabled" );
+    //setter
+    $( ".selector" ).autocomplete( "option", "disabled", false );
+
+#### appendTo
+
+Which element the menu should be appended to.
+
+Default: 'body'
+
+    f.autocomplete_field :brand_name, autocomplete_brand_name_products_path, :append_to => '#another_ellement'
+
+#### delay
+
+The delay in milliseconds the Autocomplete waits after a keystroke to activate itself. A zero-delay makes sense for local data (more responsive), but can produce a lot of load for remote data, while being less responsive.
+
+Default = 300
+
+    f.autocomplete_field :brand_name, autocomplete_brand_name_products_path, :delay => 100
+
+#### minLength
+
+The minimum number of characters a user has to type before the Autocomplete activates. Zero is useful for local data with just a few items. Should be increased when there are a lot of items, where a single character would match a few thousand items.
+
+Default = 2
+
+    f.autocomplete_field :brand_name, autocomplete_brand_name_products_path, :min_length => 0
+
+#### source
+
+Defines the data to use.
+
+The source options can obviously not be specified here since it is handled by this plugin itself.
+
 ## Formtastic
 
 If you are using [Formtastic](http://github.com/justinfrench/formtastic), you automatically get the *autocompleted_input* helper on *semantic_form_for*:
