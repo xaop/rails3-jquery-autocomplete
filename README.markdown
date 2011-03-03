@@ -156,6 +156,13 @@ If you need to use the id of the selected object, you can use the *:id_element* 
 
 This will update the field with id *#some_element with the id of the selected object. The value for this option can be any jQuery selector.
 
+### Customize the css of the result list
+
+You can add custom css for the result list (ul, li, and/or a):
+
+
+    f.autocomplete_field :brand_name, autocomplete_brand_name_products_path, :result_list_css => {:ul => {:width => "100px"}, :li => {....}, :a => {:color => "red"}}.to_json
+
 ## Formtastic
 
 If you are using [Formtastic](http://github.com/justinfrench/formtastic), you automatically get the *autocompleted_input* helper on *semantic_form_for*:
