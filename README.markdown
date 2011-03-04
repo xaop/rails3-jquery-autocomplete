@@ -193,16 +193,19 @@ In the example above, you will search by _name_, but the autocomplete list will 
 
 This wouldn't really make much sense unless you use it with the :id_element HTML tag. (See below)
 
-#### :scope
+#### :scope and :scopes
 
-If you want the autocomplete results to be found based on a model scope instead of on a model attibute you can set the :scope option to true:
+If you want the autocomplete results to be found based on a model scope instead of on a model attibute you can set the :scope or :scopes option.
 
     class ProductsController < Admin::BaseController
-      autocomplete :brand, :my_scope, :scope => true, :display_value => :name
+      autocomplete :brand, :name, :scope => "a_scope", :display_value => :name
+      #or
+      autocomplete :brand, :name, :scopes => ["first_scope", "second_scope"], :display_value => :name
     end
 
-The second attribute is the scope name (and not an attribute)
-Also note that you have to specify the :display_value attribute. Otherwize the code will ask the brand object for his 'my_scope' value and that will fail.
+The last scope we receive the 'term' value as parameter.
+
+If you don't set the :display_value option, the second attribute will be use for the display value.
 
 ### View
 

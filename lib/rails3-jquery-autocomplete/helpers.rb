@@ -103,16 +103,25 @@ module Rails3JQueryAutocomplete
 
       limit = get_autocomplete_limit(options)
       implementation = get_implementation(model)
+      all_scopes = [(options[:scope] || options[:scopes])].flatten.compact
+      have_scope = all_scopes.any?
 
 
-      if options[:scope]
+      if parent
+        relation_name = options[:relation_name] || model.name.underscore.pluralize
+        initial_scope = parent.send(relation_name)
+      else
+        initial_scope = model
+      end
+      if have_scope
         # If we use a scope the order should be done in this scope.
-        if parent
-          relation_name = options[:relation_name] || model.name.underscore.pluralize
-          items = parent.send(relation_name).send(method.to_sym, term).limit(limit)
+        last_scope = all_scopes.pop
+        if all_scopes.any?
+          scopes_items = all_scopes.inject(initial_scope){|working_scope, new_scope| working_scope.send(new_scope.to_sym)}
         else
-          items = model.send(method.to_sym, term).limit(limit)
+          scopes_items = initial_scope
         end
+        items = scopes_items.send(last_scope.to_sym, term).limit(limit)
       else
         case implementation
         when :mongoid
@@ -124,12 +133,7 @@ module Rails3JQueryAutocomplete
           where_clause = ["LOWER(#{method}) LIKE ?", "#{(is_full_search ? '%' : '')}#{term.downcase}%"]
         end
         order = get_autocomplete_order(implementation, method, options)
-        if parent
-          relation_name = options[:relation_name] || model.name.underscore.pluralize
-          items = parent.send(relation_name).where(where_clause).limit(limit).send(order_method, order)
-        else
-          items = model.where(where_clause).limit(limit).send(order_method, order)
-        end
+        items = initial_scope.where(where_clause).limit(limit).send(order_method, order)
       end
     end
 
