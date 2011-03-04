@@ -310,6 +310,20 @@ You can add custom css for the result list (ul, li, and/or a):
 
     f.autocomplete_field :brand_name, autocomplete_brand_name_products_path, :result_list_css => {:ul => {:width => "100px"}, :li => {....}, :a => {:color => "red"}}.to_json
 
+### Working client side
+
+You also have the possibility to work client side. That mean that no remote action will be called and no query will be done in the DB.
+
+If you work this way, you don't have to add anything to your controller (no "autocomplete" statment needed).
+You then also don't need to add any route in your routes.yml config file.
+
+In your view, the autocomplete_field will not take the url of a remote autocompletion method but the source elements for the autocompletion.
+
+    f.autocomplete_field :brand_name, [{:id => "my_element_id", :label => "my_element_label", :value => "my_element_value"}].to_json , :no_remote => true
+
+Don't forget to Jsonify your sources array.
+As an example, here we directly put the sources array in our view but it is better to constuct it in your controller.
+
 ## Formtastic
 
 If you are using [Formtastic](http://github.com/justinfrench/formtastic), you automatically get the *autocompleted_input* helper on *semantic_form_for*:
