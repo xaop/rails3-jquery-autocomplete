@@ -319,10 +319,12 @@ You then also don't need to add any route in your routes.yml config file.
 
 In your view, the autocomplete_field will not take the url of a remote autocompletion method but the source elements for the autocompletion.
 
-    f.autocomplete_field :brand_name, [{:id => "my_element_id", :label => "my_element_label", :value => "my_element_value"}].to_json , :no_remote => true
+    f.autocomplete_field :brand_name, [{:id => "my_element_id", :label => "my_element_label", :value => "my_element_value", :for_search => "pattern_for_search"}].to_json , :no_remote => true
 
 Don't forget to Jsonify your sources array.
 As an example, here we directly put the sources array in our view but it is better to constuct it in your controller.
+
+Also note that you can pass a :for_search element in your source hash. This will be the text use for the autocompletion query.
 
 ## Formtastic
 
