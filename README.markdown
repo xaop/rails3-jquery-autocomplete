@@ -232,6 +232,13 @@ Or in the case of a "member" route (see: "Limit the results based on the model r
 
 Now your autocomplete code is unobtrusive, Rails 3 style.
 
+### Submit on select
+
+Sometimes you may want your form to be submited as soon as you select an element in the autocomplete item list.
+You just have to set the ':submit_on_select' option to true:
+
+    f.autocomplete_field :brand_name, autocomplete_brand_name_products_path, :submit_on_select => true
+
 ### Getting the object id
 
 If you need to use the id of the selected object, you can use the *:id_element* HTML tag too:
