@@ -91,25 +91,39 @@ module Rails3JQueryAutocomplete
       limit = get_autocomplete_limit(options)
       implementation = get_implementation(model)
 
+      all_scopes = [(options[:scope] || options[:scopes])].flatten.compact
+      have_scope = all_scopes.any?
       case implementation
         when :mongoid
           order_method = "order_by"
           search = (is_full_search ? '.*' : '^') + term + '.*'
-          if options[:scope]
-            items = model.send(method.to_sym, term).limit(limit)
+          if have_scope
+            last_scope = all_scopes.pop
+            if all_scopes.any?
+              scopes_items = all_scopes.inject(model){|working_scope, new_scope| working_scope.send(new_scope.to_sym)}
+            else
+              scopes_items = model
+            end
+            items = scopes_items.send(last_scope.to_sym, term).limit(limit)
           else
             items = model.where(method.to_sym => /#{search}/i).limit(limit)
           end
         when :activerecord
           order_method = "order"
-          if options[:scope]
-            items = model.send(method.to_sym, term).limit(limit)
+          if have_scope
+            last_scope = all_scopes.pop
+            if all_scopes.any?
+              scopes_items = all_scopes.inject(model){|working_scope, new_scope| working_scope.send(new_scope.to_sym)}
+            else
+              scopes_items = model
+            end
+            items = scopes_items.send(last_scope.to_sym, term).limit(limit)
           else
             items = model.where(["LOWER(#{method}) LIKE ?", "#{(is_full_search ? '%' : '')}#{term.downcase}%"]).limit(limit)
           end
       end
 
-      if options[:scope] 
+      if have_scope
         items
       else # If we use a scope the order should be done in this scope.
         order = get_autocomplete_order(implementation, method, options)
