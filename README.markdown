@@ -156,6 +156,13 @@ If you need to use the id of the selected object, you can use the *:id_element* 
 
 This will update the field with id *#some_element with the id of the selected object. The value for this option can be any jQuery selector.
 
+### Submit on select
+
+Sometimes you may want your form to be submited as soon as you select an element in the autocomplete item list.
+You just have to set the ':submit_on_select' option to true:
+
+    f.autocomplete_field :brand_name, autocomplete_brand_name_products_path, :submit_on_select => true
+
 ## Formtastic
 
 If you are using [Formtastic](http://github.com/justinfrench/formtastic), you automatically get the *autocompleted_input* helper on *semantic_form_for*:
