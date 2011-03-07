@@ -163,6 +163,12 @@ You just have to set the ':submit_on_select' option to true:
 
     f.autocomplete_field :brand_name, autocomplete_brand_name_products_path, :submit_on_select => true
 
+### Javascript on_select
+
+If you want to persom some custom javascript when a user select an element in the autocomplete item list, you can add it via the :on_select option:
+
+    f.autocomplete_field :brand_name, autocomplete_brand_name_products_path, :on_select => "alert('Hello World')"
+
 ## Formtastic
 
 If you are using [Formtastic](http://github.com/justinfrench/formtastic), you automatically get the *autocompleted_input* helper on *semantic_form_for*:
