@@ -8,3 +8,7 @@ end
 Then /^I should (see|not see) "([^"]+)" in the autocomplete list$/ do |see_or_not, text|
   Then "I should #{see_or_not} \"#{text}\" within \"ul.ui-autocomplete.ui-menu\""
 end
+
+Then /^I should see "([^"]+)" elements? in the autocomplete list$/ do |nbr|
+  page.should have_xpath("//div[@id='activity_dialog']//ul/li", :count => nbr.to_i)
+end
