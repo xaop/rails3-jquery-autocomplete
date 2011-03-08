@@ -326,6 +326,12 @@ As an example, here we directly put the sources array in our view but it is bett
 
 Also note that you can pass a :for_search element in your source hash. This will be the text use for the autocompletion query.
 
+### Javascript on_select
+
+If you want to persom some custom javascript when a user select an element in the autocomplete item list, you can add it via the :on_select option:
+
+    f.autocomplete_field :brand_name, autocomplete_brand_name_products_path, :on_select => "alert('Hello World')"
+
 ## Formtastic
 
 If you are using [Formtastic](http://github.com/justinfrench/formtastic), you automatically get the *autocompleted_input* helper on *semantic_form_for*:
