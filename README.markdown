@@ -310,6 +310,14 @@ You can add custom css for the result list (ul, li, and/or a):
 
     f.autocomplete_field :brand_name, autocomplete_brand_name_products_path, :result_list_css => {:ul => {:width => "100px"}, :li => {....}, :a => {:color => "red"}}.to_json
 
+### Search on focus
+
+You can use the :search_on_focus option if you want to trigger the search when the autocomplete_field get the focus
+
+Default = false
+
+    f.autocomplete_field :brand_name, autocomplete_brand_name_products_path, :search_on_focus => true
+    
 ### Working client side
 
 You also have the possibility to work client side. That mean that no remote action will be called and no query will be done in the DB.
